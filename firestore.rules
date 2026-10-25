@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// myaccountbook 보안 규칙
+// Firebase 콘솔 > Firestore Database > 규칙 탭에 이 내용을 그대로 붙여 넣고 [게시]를 누르세요.
+// 아래 두 이메일을 함께 쓸 두 사람의 구글 계정으로 바꿔 주세요 (firebase-config.js의 allowedEmails와 같게).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isCouple() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          '첫번째@gmail.com',
+          '두번째@gmail.com'
+        ];
+    }
+
+    match /books/{bookId}/{document=**} {
+      allow read, write: if isCouple();
+    }
+  }
+}
