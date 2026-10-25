@@ -295,6 +295,15 @@ button { cursor: pointer; }
 .todo-edit .tr input[type="text"] { border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; background: var(--paper); min-width: 0; }
 .todo-edit .tr button { border: 0; background: transparent; color: var(--ink-3); font-size: 16px; }
 .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+/* login gate (Firebase) */
+.gate { position: fixed; inset: 0; z-index: 40; background: var(--bg); display: grid; place-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
+.gate-card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 28px 24px; width: min(380px, 100%); display: grid; gap: 14px; justify-items: center; text-align: center; box-shadow: var(--shadow); }
+.gate-card p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.gate-card .err { font-size: 13px; }
+.g-btn { display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 10px 18px; font-weight: 600; }
+.g-btn:hover { background: var(--bg); }
+.g-btn svg { width: 18px; height: 18px; }
 /* base reset so the file also works when opened directly in a browser */
 html { -webkit-text-size-adjust: 100%; }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -340,6 +349,15 @@ img { max-width: 100%; }
   <div id="view"></div>
 </main>
 <div class="tip" id="tip" hidden></div>
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <div class="brand">myaccountbook</div>
+    <p id="gateMsg">부부가 함께 쓰는 가계부예요. 구글 계정으로 로그인해 주세요.</p>
+    <div class="err" id="gateErr" hidden></div>
+    <button class="g-btn" id="gateLogin" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Google 계정으로 로그인</button>
+    <button class="ghost" id="gateLogout" hidden>다른 계정으로 로그인</button>
+  </div>
+</div>
 <div id="modalRoot"></div>
 
 <script>
@@ -402,7 +420,7 @@ img { max-width: 100%; }
     filterType: "all", filterWho: "all",
     diary: [], dCat: "all", dQuery: "", dDay: null, dView: "check", dHideDone: false, qaDate: null, qaCat: null, focusQA: false,
     selDay: todayStr(),
-    uid: null, me: null, profiles: {}, readOnly: false, mode: "loading"
+    uid: null, me: null, profiles: {}, readOnly: false, mode: "loading", backend: "loading"
   };
   const TABS = ["ledger", "cal", "diary", "stats", "settings"];
   if (!TABS.includes(S.tab)) S.tab = "ledger";
@@ -469,6 +487,7 @@ img { max-width: 100%; }
     try { await fn(); return true; }
     catch (e) {
       if (e && e.code === "invalid_argument") { setReadOnly(); toast("저장 권한이 없어요. 공유한 사람에게 '편집' 권한을 요청하세요."); }
+      else if (e && e.code === "permission-denied") toast("저장 권한이 없어요. Firebase 보안 규칙에 이 계정의 이메일이 들어 있는지 확인해 주세요.");
       else if (e && e.code === "quota_exceeded") toast("저장 공간이 가득 찼어요. 오래된 내역을 정리해 주세요.");
       else toast("저장하지 못했어요. 잠시 후 다시 시도해 주세요.");
       return false;
@@ -954,22 +973,26 @@ img { max-width: 100%; }
         <div class="field"><label for="memB">두 번째</label><input id="memB" value="${esc(st.members.b)}" maxlength="10"></div></div>
         <div class="actions"><span class="saved" id="memSaved"></span><button class="primary" data-act="saveMembers">이름 저장</button></div>
         <h2>함께 쓰는 법</h2>
-        ${S.mode === "shared" ? `<div class="help"><ol>
+        ${S.backend === "firebase" ? `<div class="help"><ol>
+          <li>허용된 두 구글 계정으로 로그인하면 내역·일정·다이어리가 실시간으로 함께 보여요.</li>
+          <li>계정을 바꾸거나 추가하려면 <b>firebase-config.js</b>의 allowedEmails와 Firebase 보안 규칙에 이메일을 넣으세요.</li>
+          <li>각 내역 오른쪽의 작은 프로필 사진이 누가 적었는지 알려줘요.</li>
+        </ol></div>` : S.mode === "shared" ? `<div class="help"><ol>
           <li>이 페이지 오른쪽 위 <b>공유</b> 메뉴에서 배우자를 초대하고 권한을 <b>편집</b>(또는 참여)으로 주세요.</li>
           <li>배우자가 같은 링크로 들어오면 두 사람이 적은 내역과 일정이 실시간으로 함께 보여요.</li>
           <li>각 내역 오른쪽의 작은 프로필 사진이 누가 적었는지 알려줘요.</li>
         </ol></div>` : `<div class="help"><ol>
           <li>지금은 웹사이트(또는 HTML 파일)로 열어서 기록이 이 브라우저에만 저장돼요.</li>
-          <li>부부가 실시간으로 같이 쓰려면 claude.ai에 올린 공유 링크로 열어 주세요.</li>
-          <li>여기 적은 내용은 아래 <b>백업 파일 저장</b>으로 받은 뒤, 공유 링크의 설정 탭에서 <b>백업 불러오기</b>로 옮길 수 있어요.</li>
+          <li>부부가 실시간으로 같이 쓰려면 Firebase 설정(README 참고)을 하거나 claude.ai 공유 링크로 열어 주세요.</li>
+          <li>여기 적은 내용은 아래 <b>백업 파일 저장</b>으로 받은 뒤, 함께 쓰는 곳의 설정 탭에서 <b>백업 불러오기</b>로 옮길 수 있어요.</li>
         </ol></div>`}
       </section>
       <section class="panel"><h2>데이터 백업 <small>${S.mode === "shared" ? "공유 저장소" : "이 브라우저"}</small></h2>
         <div class="help">${S.mode === "shared"
-          ? "다른 곳(HTML 파일)에서 저장한 백업 파일을 이 공유 가계부로 불러올 수 있어요. 같은 내역은 덮어써요."
+          ? "공유 기록 전체(2년 전~1년 뒤)를 백업 파일로 받거나, 다른 곳에서 저장한 백업 파일을 불러올 수 있어요. 같은 내역은 덮어써요."
           : "기록은 이 브라우저 안에만 있어서 브라우저 기록을 지우면 사라져요. 가끔 백업 파일을 저장해 두세요."}</div>
         <div class="actions" style="justify-content:flex-start">
-          ${S.mode !== "shared" && canSaveFile() ? `<button class="primary" data-act="backupSave">백업 파일 저장</button>` : ""}
+          ${canSaveFile() ? `<button class="primary" data-act="backupSave">백업 파일 저장</button>` : ""}
           <label class="ghost" style="display:inline-block;cursor:pointer">백업 불러오기<input type="file" id="backupFile" accept=".json,application/json" hidden></label>
           ${canSaveFile() ? `<button class="ghost" data-act="csvMonth">${Number(S.ym.slice(5))}월 내역 CSV 저장</button>` : ""}
         </div>
@@ -1517,7 +1540,23 @@ img { max-width: 100%; }
     await saveFile(`myaccountbook-${S.ym}.csv`, "﻿" + lines.join("\n") + "\n", "text/csv");
   }
   async function exportBackup() {
-    const body = { app: "myaccountbook", version: 1, exportedAt: new Date().toISOString(), data: localDump() };
+    let data;
+    if (S.mode !== "shared" && localDump) data = localDump();
+    else {
+      // 공유 저장소: 설정·반복 일정과 2년 전~1년 뒤 월별 기록을 모음
+      const strip = rows => Object.fromEntries(rows.map(({ id, ...d }) => [id, d]));
+      data = { settings: { main: S.settings }, recurring: strip(S.recurring) };
+      const msg = $("#bkMsg"); const base = todayStr().slice(0, 7);
+      for (let k = -24; k <= 12; k++) {
+        const ym = shiftYm(base, k);
+        for (const kind of ["tx", "events", "diary"]) {
+          const rows = await store.getCol(`months/${ym}/${kind}`);
+          if (rows.length) data[`months/${ym}/${kind}`] = strip(rows);
+        }
+        if (msg) msg.textContent = `백업 준비 중… ${k + 25}/37`;
+      }
+    }
+    const body = { app: "myaccountbook", version: 1, exportedAt: new Date().toISOString(), data };
     await saveFile(`myaccountbook-백업-${todayStr()}.json`, JSON.stringify(body, null, 1), "application/json");
   }
   async function importBackup(file) {
@@ -1564,6 +1603,89 @@ img { max-width: 100%; }
     subscribeMonth();
   }
 
+  // ---------- Firebase (GitHub Pages 등 claude.ai 밖에서 부부가 함께 쓰기) ----------
+  const FB_VER = "10.12.2";
+  let people = {};
+  function loadScript(src) {
+    return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = () => rej(new Error("load " + src)); document.head.appendChild(el); });
+  }
+  function initialAvatar(name) {
+    const ch = esc((name || "?").trim().charAt(0) || "?");
+    return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" rx="20" fill="#1f5c4f"/><text x="20" y="26" font-size="18" text-anchor="middle" fill="#fff" font-family="sans-serif">${ch}</text></svg>`);
+  }
+  function makeFirebaseStore(fs, root) {
+    const P = p => `${root}/${p}`;
+    const toRows = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const onErr = e => { console.warn("firestore", e); if (e && e.code === "permission-denied") showGate("denied"); };
+    return {
+      subCol(path, cb) { return fs.collection(P(path)).onSnapshot(s => cb(toRows(s)), onErr); },
+      subDoc(path, cb) { return fs.doc(P(path)).onSnapshot(s => cb(s.exists ? s.data() : null), onErr); },
+      async getCol(path) { return toRows(await fs.collection(P(path)).get()); },
+      async add(path, v) { await fs.collection(P(path)).add(v); },
+      async set(path, v) { await fs.doc(P(path)).set(v); },
+      async del(path) { await fs.doc(P(path)).delete(); }
+    };
+  }
+  function showGate(kind, detail) {
+    $("#gate").hidden = false;
+    const msg = $("#gateMsg"), err = $("#gateErr"), login = $("#gateLogin"), out = $("#gateLogout");
+    err.hidden = true; login.hidden = true; out.hidden = true;
+    if (kind === "loading") msg.textContent = "불러오는 중이에요…";
+    else if (kind === "login") { msg.textContent = "부부가 함께 쓰는 가계부예요. 구글 계정으로 로그인해 주세요."; login.hidden = false; }
+    else if (kind === "denied") {
+      msg.textContent = `${detail || "이"} 계정은 이 가계부를 쓸 수 없어요.`;
+      err.textContent = "함께 쓸 계정이라면 firebase-config.js의 allowedEmails와 Firebase 보안 규칙에 이 이메일을 추가해 주세요.";
+      err.hidden = false; out.hidden = false; return;
+    }
+    else { msg.textContent = "Firebase에 연결하지 못했어요."; }
+    if (detail) { err.textContent = detail; err.hidden = false; }
+  }
+  function loginErr(e) {
+    const c = e && e.code;
+    if (c === "auth/unauthorized-domain") return `이 주소(${location.hostname})가 Firebase에 등록되지 않았어요. Firebase 콘솔 > Authentication > 설정 > 승인된 도메인에 추가해 주세요.`;
+    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "로그인 창이 닫혔어요. 다시 눌러 주세요.";
+    if (c === "auth/operation-not-allowed") return "Firebase 콘솔 > Authentication에서 Google 로그인을 사용 설정해 주세요.";
+    if (c === "auth/network-request-failed") return "인터넷 연결을 확인해 주세요.";
+    return (e && e.message) || "알 수 없는 오류가 났어요.";
+  }
+  async function startFirebase(cfg) {
+    S.backend = "firebase";
+    showGate("loading");
+    try { for (const part of ["app", "auth", "firestore"]) await loadScript(`https://cdn.jsdelivr.net/npm/firebase@${FB_VER}/firebase-${part}-compat.js`); }
+    catch { showGate("error", "Firebase를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요."); return; }
+    const fb = window.firebase;
+    try { fb.initializeApp(cfg.firebase); }
+    catch (e) { showGate("error", "firebase-config.js 설정값을 확인해 주세요. (" + e.message + ")"); return; }
+    const auth = fb.auth(), fs = fb.firestore();
+    const provider = new fb.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    $("#gateLogin").onclick = () => auth.signInWithPopup(provider).catch(e => {
+      if (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment") auth.signInWithRedirect(provider);
+      else showGate("login", loginErr(e));
+    });
+    $("#gateLogout").onclick = () => auth.signOut();
+    document.addEventListener("click", e => { if (e.target.id === "logoutBtn") auth.signOut(); });
+    auth.getRedirectResult().catch(e => showGate("login", loginErr(e)));
+    let started = false;
+    auth.onAuthStateChanged(u => {
+      if (!u) { if (started) location.reload(); else showGate("login"); return; }
+      const allowed = (cfg.allowedEmails || []).map(x => String(x).trim().toLowerCase()).filter(Boolean);
+      if (allowed.length && !allowed.includes((u.email || "").toLowerCase())) { showGate("denied", u.email); return; }
+      if (started) return;
+      started = true;
+      S.uid = u.uid; S.mode = "shared";
+      $("#meBox").innerHTML = `<img alt="" src="${esc(u.photoURL || initialAvatar(u.displayName || u.email))}"><span>${esc(u.displayName || u.email || "나")}</span><button class="today-btn" id="logoutBtn" style="height:26px;font-size:12px">로그아웃</button>`;
+      const root = `books/${cfg.bookId || "main"}`;
+      store = makeFirebaseStore(fs, root);
+      fs.doc(`${root}/people/${u.uid}`).set({ name: u.displayName || "", photo: u.photoURL || "", email: u.email || "", at: Date.now() })
+        .catch(e => { if (e.code === "permission-denied") showGate("denied", u.email); });
+      fs.collection(`${root}/people`).onSnapshot(snap => { people = Object.fromEntries(snap.docs.map(d => [d.id, d.data()])); fillAvatars(); }, () => {});
+      userApi = { profiles: async ids => Object.fromEntries([].concat(ids).map(id => [id, { name: people[id]?.name || "", avatarUrl: people[id]?.photo || initialAvatar(people[id]?.name) }])) };
+      $("#gate").hidden = true;
+      start(false);
+    });
+  }
+
   render();
   (async () => {
     const claude = window.claude;
@@ -1576,8 +1698,16 @@ img { max-width: 100%; }
       const can = await user.can("data.write");
       if (can === false) setReadOnly();
     }
-    if (db) { S.mode = "shared"; store = makeDbStore(db); start(false); }
-    else {
+    if (db) { S.mode = "shared"; S.backend = "claude"; store = makeDbStore(db); start(false); return; }
+    if (!claude && !isFramed) {
+      // GitHub Pages 등: firebase-config.js 에 설정이 있으면 Firebase로 함께 쓰기
+      await loadScript("firebase-config.js").catch(() => {});
+      const cfg = window.MYACCOUNTBOOK_CONFIG;
+      const key = cfg && cfg.firebase && cfg.firebase.apiKey;
+      if (key && !/여기에|YOUR_/i.test(key)) { startFirebase(cfg); return; }
+    }
+    S.backend = "local";
+    {
       S.mode = "local";
       if (!storageWorks()) showBanner("이 브라우저는 파일로 연 페이지의 저장을 막고 있어요. 새로고침하면 기록이 사라지니 Chrome이나 Edge로 열어 주세요.");
       else if (!claude) showBanner("여기 적은 내용은 지금 쓰는 브라우저에만 저장돼요. 다른 기기로 옮기거나 지켜 두려면 설정 탭에서 백업 파일을 저장하세요.");
