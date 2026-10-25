@@ -12,8 +12,8 @@ window.MYACCOUNTBOOK_CONFIG = {
   },
   // 함께 쓸 두 사람의 구글 계정 이메일 (firestore.rules에도 똑같이 넣어 주세요)
   allowedEmails: [
-    "첫번째@gmail.com",
-    "두번째@gmail.com"
+    "shlee5316@gmail.com",
+    "ljs9323@gmail.com"
   ],
   // 가계부 이름(저장 위치). 바꾸면 새 가계부가 만들어져요.
   bookId: "main"
