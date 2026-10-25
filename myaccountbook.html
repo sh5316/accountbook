@@ -1705,6 +1705,11 @@ img { max-width: 100%; }
       const cfg = window.MYACCOUNTBOOK_CONFIG;
       const key = cfg && cfg.firebase && cfg.firebase.apiKey;
       if (key && !/여기에|YOUR_/i.test(key)) { startFirebase(cfg); return; }
+      if (/^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+        S.backend = "local"; S.mode = "local";
+        showBanner("Firebase 설정값이 이 사이트에 배포되지 않아 구글 로그인 없이 이 브라우저에만 저장돼요. 저장소의 firebase-config.js 설정값을 확인해 주세요.");
+        start(true); return;
+      }
     }
     S.backend = "local";
     {
