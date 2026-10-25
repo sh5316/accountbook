@@ -1,4 +1,9 @@
-<title>우리집 가계부</title>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>myaccountbook</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -222,14 +227,90 @@ button { cursor: pointer; }
 .saved { font-size: 12px; color: var(--accent); }
 .help { font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
 .help ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+/* import / preset schedules */
+.sheet.wide { width: min(640px, 100%); }
+.preset-group { display: grid; gap: 6px; }
+.preset-group h4 { margin: 4px 0 0; font-size: 12px; color: var(--ink-3); font-weight: 500; letter-spacing: .4px; }
+.preset { display: grid; grid-template-columns: 22px minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
+.preset.done { opacity: .55; }
+.preset input[type="text"] { border: 0; background: transparent; padding: 2px 0; min-width: 0; width: 100%; }
+.preset .when { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.preset .when input { width: 46px; border: 1px solid var(--line); border-radius: 6px; padding: 3px 4px; text-align: right; background: var(--paper); }
+.drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 22px 14px; text-align: center; display: grid; gap: 8px; justify-items: center; color: var(--ink-2); }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop small { color: var(--ink-3); }
+.fmt { font-size: 12px; color: var(--ink-3); background: var(--bg); border-radius: 8px; padding: 8px 10px; overflow-x: auto; }
+.fmt code { white-space: pre; font-size: 11.5px; }
+.pv-wrap { max-height: 280px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+.pv { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.pv th, .pv td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+.pv th { position: sticky; top: 0; background: var(--bg); font-weight: 500; color: var(--ink-3); }
+.pv td.t { white-space: normal; min-width: 140px; }
+.pv tr.bad td { color: var(--ink-3); }
+.pv .note { color: var(--expense); font-size: 11.5px; }
+.progress { font-size: 13px; color: var(--accent); }
 @media (prefers-reduced-motion: no-preference) { .sheet { animation: up .16s ease-out; } @keyframes up { from { transform: translateY(8px); opacity: .6; } } }
+/* diary */
+.d-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.d-search { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--paper); }
+.d-day { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 8px; }
+.d-day > .day-head { padding: 0 2px; }
+.d-card { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px; cursor: pointer; background: var(--paper); }
+.d-card:hover { border-color: var(--ink-3); }
+.d-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.d-head .ttl { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.d-head .tm { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.d-cat { font-size: 11px; font-weight: 600; border-radius: 4px; padding: 1px 6px; color: #fff; white-space: nowrap; }
+.d-check { width: 18px; height: 18px; accent-color: var(--accent); flex: none; margin: 0; cursor: pointer; }
+.d-card.is-done .ttl, .ck-row.is-done .ck-title { text-decoration: line-through; color: var(--ink-3); }
+.d-card.is-done { opacity: .7; }
+.ck-group { display: grid; gap: 4px; }
+.ck-row { display: grid; grid-template-columns: 22px minmax(0,1fr); gap: 8px; align-items: start; padding: 8px 6px; border-radius: 8px; border-bottom: 1px solid var(--line); }
+.ck-row:hover { background: var(--bg); }
+.ck-row .d-check { margin-top: 2px; }
+.ck-main { display: grid; gap: 3px; min-width: 0; }
+.ck-title { font-weight: 500; cursor: pointer; overflow-wrap: anywhere; }
+.ck-meta { font-size: 12px; color: var(--ink-3); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ck-main .todos { padding-left: 2px; }
+.quick-add { display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 6px; }
+.quick-add input, .quick-add select { border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: var(--paper); min-width: 0; }
+@media (max-width: 600px) { .quick-add { grid-template-columns: 1fr 1fr; } .quick-add #qaTitle { grid-column: 1 / -1; } }
+.todo.late .d-prog { color: var(--expense); }
+.d-body { font-size: 13px; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.todos { display: grid; gap: 2px; }
+.todo { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 2px 0; }
+.todo input { width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.todo.done span { text-decoration: line-through; color: var(--ink-3); }
+.d-prog { font-size: 11px; color: var(--ink-3); }
+.mini { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 2px; text-align: center; }
+.mini .wh { font-size: 11px; color: var(--ink-3); padding: 2px 0; }
+.mini button { border: 0; background: transparent; border-radius: 8px; padding: 4px 0 6px; font-size: 13px; display: grid; justify-items: center; gap: 2px; }
+.mini button:hover { background: var(--bg); }
+.mini button.on { background: var(--accent); color: var(--paper); }
+.mini button.today:not(.on) { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.mini .dots { display: flex; gap: 2px; height: 5px; }
+.mini .dots i { width: 5px; height: 5px; border-radius: 50%; }
+.todo-edit { display: grid; gap: 4px; }
+.todo-edit .tr { display: grid; grid-template-columns: 18px minmax(0,1fr) 28px; gap: 6px; align-items: center; }
+.todo-edit .tr input[type="text"] { border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; background: var(--paper); min-width: 0; }
+.todo-edit .tr button { border: 0; background: transparent; color: var(--ink-3); font-size: 16px; }
+.field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+/* base reset so the file also works when opened directly in a browser */
+html { -webkit-text-size-adjust: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
 </style>
+</head>
+<body>
+<noscript><p style="padding:16px">이 가계부는 JavaScript가 켜져 있어야 동작해요. 브라우저 설정에서 JavaScript를 허용해 주세요.</p></noscript>
 
 <header class="top">
   <div class="top-in">
     <div class="brand">
       <svg viewBox="0 0 26 26" aria-hidden="true"><rect x="3" y="4" width="20" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h20M8 2v4M18 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9 15h8M13 12v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      우리집 가계부
+      myaccountbook
     </div>
     <div class="month-nav">
       <button class="icon-btn" id="prevM" aria-label="이전 달">‹</button>
@@ -241,6 +322,7 @@ button { cursor: pointer; }
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="ledger" aria-selected="true">가계부</button>
       <button role="tab" data-tab="cal" aria-selected="false">캘린더</button>
+      <button role="tab" data-tab="diary" aria-selected="false">다이어리</button>
       <button role="tab" data-tab="stats" aria-selected="false">통계</button>
       <button role="tab" data-tab="settings" aria-selected="false">설정</button>
     </nav>
@@ -268,7 +350,8 @@ button { cursor: pointer; }
     cats: {
       out: ["식비", "외식·카페", "생활용품", "주거·관리비", "통신", "교통·차량", "의료·건강", "쇼핑·의류", "문화·여가", "경조사", "육아·교육", "보험", "기타지출"],
       in: ["월급", "상여금", "부수입", "용돈", "금융수익", "기타수입"],
-      save: ["적금", "예금", "투자", "비상금", "청약"]
+      save: ["적금", "예금", "투자", "비상금", "청약"],
+      diary: ["업무", "개인", "일정", "건강", "공부", "메모"]
     },
     methods: ["카드", "현금", "계좌이체", "간편결제"],
     budget: { total: 0, cats: {} }
@@ -317,18 +400,27 @@ button { cursor: pointer; }
     tx: [], events: [], recurring: [], prevTx: null,
     settings: structuredClone(DEFAULT_SETTINGS),
     filterType: "all", filterWho: "all",
+    diary: [], dCat: "all", dQuery: "", dDay: null, dView: "check", dHideDone: false, qaDate: null, qaCat: null, focusQA: false,
     selDay: todayStr(),
     uid: null, me: null, profiles: {}, readOnly: false, mode: "loading"
   };
-  if (!["ledger", "cal", "stats", "settings"].includes(S.tab)) S.tab = "ledger";
-  if (location.hash && ["ledger", "cal", "stats", "settings"].includes(location.hash.slice(1))) S.tab = location.hash.slice(1);
+  const TABS = ["ledger", "cal", "diary", "stats", "settings"];
+  if (!TABS.includes(S.tab)) S.tab = "ledger";
+  if (location.hash && TABS.includes(location.hash.slice(1))) S.tab = location.hash.slice(1);
 
   // ---------- storage layer (shared db, or this-browser fallback) ----------
   function makeLocalStore() {
     let data = {};
     try { data = JSON.parse(lsGet("hb.local") || "{}") || {}; } catch { data = {}; }
+    // 예전 버전의 '나만 보기' 다이어리를 공유 다이어리로 합침
+    for (const k of Object.keys(data)) {
+      const m = k.match(/^data\/users\/[^/]+\/m-(\d{4}-\d{2})\/diary$/);
+      if (m) { data[`months/${m[1]}/diary`] = { ...(data[`months/${m[1]}/diary`] || {}), ...data[k] }; delete data[k]; }
+    }
     const subs = new Set();
     const save = () => { lsSet("hb.local", JSON.stringify(data)); subs.forEach(f => f()); };
+    localDump = () => JSON.parse(JSON.stringify(data));
+    localReplace = next => { data = next; save(); };
     const colOf = p => p.split("/").slice(0, -1).join("/");
     const idOf = p => p.split("/").pop();
     return {
@@ -364,9 +456,10 @@ button { cursor: pointer; }
   function subscribeMonth() {
     unsubMonth.forEach(u => u()); unsubMonth = [];
     const ym = S.ym;
-    S.tx = []; S.events = []; S.prevTx = null;
+    S.tx = []; S.events = []; S.prevTx = null; S.diary = []; S.dDay = null;
     unsubMonth.push(store.subCol(`months/${ym}/tx`, rows => { if (S.ym === ym) { S.tx = rows; render(); } }));
     unsubMonth.push(store.subCol(`months/${ym}/events`, rows => { if (S.ym === ym) { S.events = rows; render(); } }));
+    unsubMonth.push(store.subCol(`months/${ym}/diary`, rows => { if (S.ym === ym) { S.diary = rows; renderDiaryOnly(); } }));
     store.getCol(`months/${shiftYm(ym, -1)}/tx`).then(rows => { if (S.ym === ym) { S.prevTx = rows; renderSummary(); } }).catch(() => {});
     render();
   }
@@ -426,12 +519,225 @@ button { cursor: pointer; }
     $("#monthTitle").textContent = `${y}년 ${m}월`;
     document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === S.tab)));
     renderSummary();
+    $(".summary").hidden = S.tab === "diary";
     const v = $("#view");
     if (S.tab === "ledger") v.innerHTML = viewLedger();
     else if (S.tab === "cal") v.innerHTML = viewCal();
+    else if (S.tab === "diary") v.innerHTML = viewDiary();
     else if (S.tab === "stats") v.innerHTML = viewStats();
     else v.innerHTML = viewSettings();
     fillAvatars();
+    if (S.focusQA && S.tab === "diary") { S.focusQA = false; const q = $("#qaTitle"); if (q) q.focus(); }
+  }
+  // diary snapshots only redraw the diary tab, so typing in other tabs is never interrupted
+  function renderDiaryOnly() { if (S.tab === "diary") render(); }
+
+  // ---------- diary ----------
+  // 다이어리는 모두 months/<월>/diary 에 저장되어 부부가 함께 봄. 각 기록과 할 일은 체크리스트로 완료 표시
+  const diaryPath = ym => `months/${ym}/diary`;
+  const DCOLORS = ["#2f6fb5", "#2f8f7a", "#c98a12", "#c2477a", "#7a5ad1", "#6b7a72", "#b5552f", "#3d8fb0"];
+  const dColor = cat => { const i = S.settings.cats.diary.indexOf(cat); return i >= 0 ? DCOLORS[i % DCOLORS.length] : "#6b7a72"; };
+  const dSort = (a, b) => a.date.localeCompare(b.date) || (a.time || "99").localeCompare(b.time || "99") || (a.at || 0) - (b.at || 0);
+  const mdw = d => { const dt = parseD(d); return `${dt.getMonth() + 1}/${dt.getDate()}(${WD[dt.getDay()]})`; };
+  function diaryFiltered() {
+    let list = S.diary.slice();
+    if (S.dDay) list = list.filter(e => e.date === S.dDay);
+    if (S.dCat !== "all") list = list.filter(e => e.cat === S.dCat);
+    if (S.dHideDone) list = list.filter(e => !e.done);
+    const q = S.dQuery.trim().toLowerCase();
+    if (q) list = list.filter(e => [e.title, e.body, ...(e.todos || []).map(t => t.t)].join(" ").toLowerCase().includes(q));
+    return list;
+  }
+  const todoList = e => (e.todos || []).length ? `<div class="todos">${e.todos.map((t, i) => `<label class="todo ${t.done ? "done" : ""}"><input type="checkbox" data-todo="${esc(e.id)}|${i}" ${t.done ? "checked" : ""}><span>${esc(t.t)}</span></label>`).join("")}</div>` : "";
+  function diaryCard(e) {
+    const todos = e.todos || [];
+    return `<article class="d-card ${e.done ? "is-done" : ""}" data-diary="${esc(e.id)}" tabindex="0" role="button">
+      <div class="d-head"><input type="checkbox" class="d-check" data-done="${esc(e.id)}" ${e.done ? "checked" : ""} aria-label="완료">
+        <span class="d-cat" style="background:${dColor(e.cat)}">${esc(e.cat || "메모")}</span>
+        <span class="ttl">${esc(e.title || "(제목 없음)")}</span>
+        ${e.time ? `<span class="tm num">${esc(e.time)}</span>` : ""}
+        <img class="av" alt="" data-uid="${esc(e.by || "")}"></div>
+      ${e.body ? `<div class="d-body">${esc(e.body)}</div>` : ""}
+      ${todoList(e)}
+      ${todos.length ? `<span class="d-prog num">할 일 ${todos.filter(t => t.done).length}/${todos.length} 완료</span>` : ""}
+    </article>`;
+  }
+  function checkRow(e) {
+    const todos = e.todos || [];
+    return `<div class="ck-row ${e.done ? "is-done" : ""}">
+      <input type="checkbox" class="d-check" data-done="${esc(e.id)}" ${e.done ? "checked" : ""} aria-label="${esc(e.title || "기록")} 완료">
+      <div class="ck-main"><div class="ck-title" data-diary="${esc(e.id)}" role="button" tabindex="0">${esc(e.title || "(제목 없음)")}</div>
+        <div class="ck-meta num"><span class="d-cat" style="background:${dColor(e.cat)}">${esc(e.cat || "메모")}</span>${mdw(e.date)}${e.time ? " " + esc(e.time) : ""}${todos.length ? ` · 할 일 ${todos.filter(t => t.done).length}/${todos.length}` : ""}</div>
+        ${todoList(e)}</div>
+    </div>`;
+  }
+  function emptyDiary() {
+    const none = !S.diary.length;
+    return `<div class="empty"><strong>${none ? "이번 달 다이어리가 비어 있어요" : "조건에 맞는 기록이 없어요"}</strong>
+      <span>회의, 마감, 병원 예약 같은 일정과 해야 할 업무를 적어 두고<br>끝낸 것은 체크해서 지워 나가세요.</span>
+      ${none ? `<button class="primary" data-act="addDiary">+ 다이어리 쓰기</button>` : ""}</div>`;
+  }
+  function diaryListHtml() {
+    const list = diaryFiltered();
+    if (!list.length) return emptyDiary();
+    if (S.dView === "check") {
+      const today = todayStr();
+      const groups = [
+        ["밀린 일", list.filter(e => !e.done && e.date < today)],
+        ["오늘", list.filter(e => !e.done && e.date === today)],
+        ["다가오는 일", list.filter(e => !e.done && e.date > today)],
+        ["완료", list.filter(e => e.done)]
+      ].filter(([, es]) => es.length);
+      return groups.map(([label, es]) => `<div class="ck-group"><div class="sec-lab">${label} <span class="num">${es.length}</span></div>
+        ${es.sort(dSort).map(checkRow).join("")}</div>`).join("");
+    }
+    const groups = {};
+    list.sort((a, b) => dSort(b, a)).forEach(e => (groups[e.date] ||= []).push(e));
+    return Object.entries(groups).map(([d, es]) => {
+      const dt = parseD(d);
+      return `<div class="d-day"><div class="day-head"><span><b>${dt.getDate()}일</b><span class="wd">${WD[dt.getDay()]}요일${HOLIDAYS[d] ? " · " + esc(HOLIDAYS[d]) : ""}</span></span>
+        <span class="tot" style="color:var(--ink-3)">${es.filter(e => e.done).length}/${es.length} 완료</span></div>${es.sort(dSort).map(diaryCard).join("")}</div>`;
+    }).join("");
+  }
+  function viewDiary() {
+    const [y, m] = S.ym.split("-").map(Number);
+    const all = S.diary;
+    const chip = (k, v, label) => `<button class="chip" data-f="${k}" data-v="${esc(v)}" aria-pressed="${S[k] === v}">${esc(label)}</button>`;
+    const startDow = new Date(y, m - 1, 1).getDay(), dim = daysIn(y, m), today = todayStr();
+    const byDay = {}; all.forEach(e => (byDay[e.date] ||= []).push(e));
+    let mini = WD.map((w, i) => `<span class="wh" style="${i === 0 ? "color:var(--sun)" : i === 6 ? "color:var(--sat)" : ""}">${w}</span>`).join("");
+    for (let i = 0; i < startDow; i++) mini += "<span></span>";
+    for (let d = 1; d <= dim; d++) {
+      const ds = `${S.ym}-${pad(d)}`; const es = byDay[ds] || [];
+      const dots = [...new Set(es.filter(e => !e.done).map(e => e.cat))].slice(0, 3).map(c => `<i style="background:${dColor(c)}"></i>`).join("")
+        || (es.length ? `<i style="background:var(--line)"></i>` : "");
+      mini += `<button data-dday="${ds}" class="${S.dDay === ds ? "on" : ""} ${ds === today ? "today" : ""}" aria-label="${m}월 ${d}일"><span class="num">${d}</span><span class="dots">${dots}</span></button>`;
+    }
+    const done = all.filter(e => e.done).length;
+    const pct = all.length ? Math.round(done / all.length * 100) : 0;
+    const open = all.filter(e => !e.done).sort(dSort);
+    const qaDate = S.qaDate && ymOf(S.qaDate) === S.ym ? S.qaDate : (S.dDay || (today.startsWith(S.ym) ? today : `${S.ym}-01`));
+    const qaCat = S.settings.cats.diary.includes(S.qaCat) ? S.qaCat : S.settings.cats.diary[0];
+    return `<div class="cols">
+      <section class="panel">
+        <h2>${m}월 다이어리 <small>${S.dDay ? `${Number(S.dDay.slice(8))}일만 보는 중 · <a href="#" data-act="clearDday" style="color:var(--accent)">전체 보기</a>` : `${all.length}개 기록`}</small></h2>
+        <div class="d-tools">
+          <div class="chips">${chip("dView", "check", "체크리스트")}${chip("dView", "list", "다이어리")}</div>
+          <button class="primary" data-act="addDiary">+ 다이어리 쓰기</button></div>
+        <form class="quick-add" id="quickAdd">
+          <input id="qaTitle" maxlength="60" placeholder="할 일·일정 빠르게 추가 (Enter)" autocomplete="off">
+          <input id="qaDate" type="date" value="${qaDate}" aria-label="날짜">
+          <select id="qaCat" aria-label="분류">${S.settings.cats.diary.map(c => `<option ${c === qaCat ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
+          <button class="ghost" type="submit">추가</button></form>
+        <div class="toolbar">
+          <div class="chips">${chip("dCat", "all", "전체")}${S.settings.cats.diary.map(c => chip("dCat", c, c)).join("")}</div>
+          <div class="chips"><button class="chip" data-act="toggleHide" aria-pressed="${S.dHideDone}">완료 숨기기</button></div>
+        </div>
+        <input class="d-search" id="dSearch" type="search" placeholder="제목·내용·할 일 검색" value="${esc(S.dQuery)}">
+        <div id="dList">${diaryListHtml()}</div>
+      </section>
+      <aside class="side">
+        <section class="panel"><h2>이번 달 진행 <small class="num">${done}/${all.length} 완료</small></h2>
+          <div class="track" style="height:10px"><div class="fill" style="width:${pct}%"></div></div>
+          <div class="mini">${mini}</div>
+          <div class="legend">${S.settings.cats.diary.map(c => `<span><i style="background:${dColor(c)}"></i>${esc(c)} ${all.filter(e => e.cat === c && !e.done).length}</span>`).join("")}<span>· 남은 개수</span></div></section>
+        <section class="panel"><h2>남은 일 <small>${open.length}개</small></h2>
+          ${open.length ? `<div class="todos">${open.slice(0, 12).map(e => `<label class="todo ${e.date < today ? "late" : ""}"><input type="checkbox" data-done="${esc(e.id)}"><span>${esc(e.title || "(제목 없음)")} <span class="d-prog num">· ${mdw(e.date)}${e.date < today ? " 밀림" : ""}</span></span></label>`).join("")}</div>`
+            : `<p style="margin:0;color:var(--ink-3);font-size:13px">${all.length ? "이번 달 할 일을 모두 끝냈어요." : "다이어리에 일정이나 업무를 적으면 끝내지 않은 것만 여기 모여요."}</p>`}
+        </section>
+      </aside>
+    </div>`;
+  }
+  const findDiary = id => S.diary.find(e => e.id === id);
+  function saveDiary(e, patch) {
+    const { id, ...doc } = e;
+    return write(() => store.set(`${diaryPath(ymOf(e.date))}/${id}`, { ...doc, ...patch, updated: Date.now() }));
+  }
+  // 기록을 체크하면 안의 할 일도 모두 완료, 할 일을 모두 체크하면 기록도 완료
+  function toggleDone(id) {
+    const e = findDiary(id); if (!e) return Promise.resolve(false);
+    const done = !e.done;
+    const patch = { done };
+    if (done && (e.todos || []).length) patch.todos = e.todos.map(t => ({ ...t, done: true }));
+    return saveDiary(e, patch);
+  }
+  function toggleTodo(key) {
+    const [id, idx] = key.split("|");
+    const e = findDiary(id); if (!e) return Promise.resolve(false);
+    const todos = (e.todos || []).map((t, i) => i === Number(idx) ? { ...t, done: !t.done } : t);
+    return saveDiary(e, { todos, done: todos.length > 0 && todos.every(t => t.done) });
+  }
+  async function quickAdd() {
+    const title = $("#qaTitle").value.trim(); if (!title) return;
+    const d = $("#qaDate").value; if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+    S.qaDate = d; S.qaCat = $("#qaCat").value;
+    const rec = { date: d, time: "", cat: S.qaCat, title, body: "", todos: [], done: false, by: S.uid || null, at: Date.now(), updated: Date.now() };
+    S.focusQA = true;
+    if (await write(() => store.add(diaryPath(ymOf(d)), rec))) {
+      if (ymOf(d) !== S.ym) { S.ym = ymOf(d); subscribeMonth(); }
+      showBanner(`'${title}'을(를) ${mdw(d)}에 추가했어요.`);
+    }
+  }
+
+  function diaryModal(existing) {
+    const st = { cat: existing?.cat || S.settings.cats.diary[0] };
+    let todos = (existing?.todos || []).map(t => ({ ...t }));
+    const date = existing?.date || S.dDay || (todayStr().startsWith(S.ym) ? todayStr() : `${S.ym}-01`);
+    let confirmDel = false;
+    const todoRows = () => todos.map((t, i) => `<div class="tr"><input type="checkbox" data-ti="${i}" ${t.done ? "checked" : ""} aria-label="완료">
+      <input type="text" data-tt="${i}" value="${esc(t.t)}" maxlength="80" aria-label="할 일"><button type="button" data-tx-del="${i}" aria-label="지우기">×</button></div>`).join("");
+    openModal(`<form id="dForm" novalidate><div style="display:grid;gap:14px">
+      <h3>${existing ? "다이어리 고치기" : "다이어리 쓰기"}</h3>
+      <div class="two"><div class="field"><label for="dDate">날짜</label><input type="date" id="dDate" value="${date}"></div>
+        <div class="field"><label for="dTime">시간 (선택)</label><input type="time" id="dTime" value="${esc(existing?.time || "")}"></div></div>
+      <div class="field"><span class="lab">분류</span>${segHtml("cat", S.settings.cats.diary.map(c => [c, c]), st.cat)}</div>
+      <div class="field"><label for="dTitle">제목</label><input id="dTitle" maxlength="60" value="${esc(existing?.title || "")}" placeholder="예: 주간 회의, 보고서 마감"></div>
+      <div class="field"><label for="dBody">내용</label><textarea id="dBody" maxlength="4000" placeholder="회의 내용, 준비할 것, 메모를 자유롭게 적어 보세요.">${esc(existing?.body || "")}</textarea></div>
+      <div class="field"><span class="lab">세부 할 일 (체크리스트)</span><div class="todo-edit" id="todoEdit">${todoRows()}</div>
+        <div class="inline-add"><input id="newTodo" maxlength="80" placeholder="할 일을 적고 Enter"><button type="button" class="ghost" id="addTodo">추가</button></div></div>
+      <label class="todo"><input type="checkbox" id="dDone" ${existing?.done ? "checked" : ""}><span>완료로 표시</span></label>
+      <div class="err" id="dErr" hidden></div>
+      <div class="actions">${existing ? `<button type="button" class="danger" id="dDel">삭제</button>` : ""}<span class="spacer"></span>
+        <button type="button" class="ghost" id="dCancel">취소</button><button type="submit" class="primary">${existing ? "저장" : "추가"}</button></div>
+    </div></form>`, root => {
+      root.classList.add("wide");
+      bindSegs(root, st);
+      const box = $("#todoEdit", root);
+      const syncTodos = () => { box.querySelectorAll("[data-tt]").forEach(inp => { todos[inp.dataset.tt].t = inp.value; }); box.querySelectorAll("[data-ti]").forEach(c => { todos[c.dataset.ti].done = c.checked; }); };
+      const redraw = () => { box.innerHTML = todoRows(); };
+      const addTodo = () => { const inp = $("#newTodo", root); const v = inp.value.trim(); if (!v) return; syncTodos(); todos.push({ t: v, done: false }); inp.value = ""; redraw(); inp.focus(); };
+      $("#addTodo", root).onclick = addTodo;
+      $("#newTodo", root).addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); addTodo(); } });
+      box.addEventListener("click", e => { const b = e.target.closest("[data-tx-del]"); if (!b) return; syncTodos(); todos.splice(Number(b.dataset.txDel), 1); redraw(); });
+      $("#dCancel", root).onclick = closeModal;
+      const oldPath = existing ? `${diaryPath(ymOf(existing.date))}/${existing.id}` : null;
+      const del = $("#dDel", root);
+      if (del) del.onclick = async () => {
+        if (!confirmDel) { confirmDel = true; del.textContent = "정말 삭제할까요?"; return; }
+        if (await write(() => store.del(oldPath))) closeModal();
+      };
+      $("#dForm", root).addEventListener("submit", async e => {
+        e.preventDefault();
+        syncTodos();
+        const d = $("#dDate", root).value, title = $("#dTitle", root).value.trim(), body = $("#dBody", root).value.trim();
+        const pending = $("#newTodo", root).value.trim(); if (pending) todos.push({ t: pending, done: false });
+        const err = $("#dErr", root);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { err.textContent = "날짜를 골라 주세요."; err.hidden = false; return; }
+        if (!title && !body && !todos.length) { err.textContent = "제목이나 내용, 할 일 중 하나는 적어 주세요."; err.hidden = false; return; }
+        const list = todos.filter(t => t.t.trim()).map(t => ({ t: t.t.trim(), done: !!t.done }));
+        let done = $("#dDone", root).checked;
+        if (done) list.forEach(t => { t.done = true; });
+        else if (list.length && list.every(t => t.done)) done = true;
+        const rec = { date: d, time: $("#dTime", root).value, cat: st.cat, title, body, todos: list, done,
+          by: existing?.by || S.uid || null, at: existing?.at || Date.now(), updated: Date.now() };
+        const target = diaryPath(ymOf(d));
+        const ok = await write(async () => {
+          if (existing && oldPath === `${target}/${existing.id}`) await store.set(oldPath, rec);
+          else { await store.add(target, rec); if (oldPath) await store.del(oldPath); }
+        });
+        if (ok) { closeModal(); if (ymOf(d) !== S.ym) { S.ym = ymOf(d); subscribeMonth(); } else render(); }
+      });
+    });
   }
 
   function renderSummary() {
@@ -537,8 +843,8 @@ button { cursor: pointer; }
         <span style="min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.title)}${e.recId ? `<span class="rep">${e.rep === "yearly" ? "매년" : "매월"}</span>` : ""}</div>
         <div class="meta" style="font-size:12px;color:var(--ink-3)">${esc([e.time, whoName(e.who)].filter(Boolean).join(" · "))}</div></span></div>`;
     }).join("");
-    return `<section class="panel"><h2>다가오는 일정 <button class="ghost" data-act="addEv" style="font-size:12px;padding:4px 10px">+ 일정</button></h2>
-      ${items ? `<div class="up-list">${items}</div>` : `<p style="margin:0;color:var(--ink-3);font-size:13px">기념일, 병원 예약, 관리비 납부일 같은 일정을 등록하면 D-day와 함께 보여요.</p>`}</section>`;
+    return `<section class="panel"><h2>다가오는 일정 <span style="display:flex;gap:6px"><button class="ghost" data-act="import" style="font-size:12px;padding:4px 10px">기본 일정·가져오기</button><button class="ghost" data-act="addEv" style="font-size:12px;padding:4px 10px">+ 일정</button></span></h2>
+      ${items ? `<div class="up-list">${items}</div>` : `<p style="margin:0;color:var(--ink-3);font-size:13px">기념일, 병원 예약, 관리비 납부일 같은 일정을 등록하면 D-day와 함께 보여요. <b>기본 일정·가져오기</b>로 월급날·카드대금·세금 납부일을 한 번에 넣거나, 휴대폰 캘린더 파일(.ics)을 올릴 수 있어요.</p>`}</section>`;
   }
 
   function viewCal() {
@@ -579,7 +885,7 @@ button { cursor: pointer; }
       </section>
       <aside class="side"><section class="panel">
         <h2>${sd.getMonth() + 1}월 ${sd.getDate()}일 ${WD[sd.getDay()]}요일 <small>${esc(HOLIDAYS[S.selDay] || "")}</small></h2>
-        <div class="actions" style="justify-content:flex-start"><button class="primary" data-act="addEv">+ 일정</button><button class="ghost" data-act="addTx">+ 내역</button></div>
+        <div class="actions" style="justify-content:flex-start"><button class="primary" data-act="addEv">+ 일정</button><button class="ghost" data-act="addTx">+ 내역</button><button class="ghost" data-act="import">기본 일정·가져오기</button></div>
         <div class="sec-lab">일정</div>
         ${evList || `<p style="margin:0;color:var(--ink-3);font-size:13px">이 날 일정이 없어요.</p>`}
         <div class="sec-lab">가계부</div>
@@ -648,18 +954,33 @@ button { cursor: pointer; }
         <div class="field"><label for="memB">두 번째</label><input id="memB" value="${esc(st.members.b)}" maxlength="10"></div></div>
         <div class="actions"><span class="saved" id="memSaved"></span><button class="primary" data-act="saveMembers">이름 저장</button></div>
         <h2>함께 쓰는 법</h2>
-        <div class="help"><ol>
+        ${S.mode === "shared" ? `<div class="help"><ol>
           <li>이 페이지 오른쪽 위 <b>공유</b> 메뉴에서 배우자를 초대하고 권한을 <b>편집</b>(또는 참여)으로 주세요.</li>
           <li>배우자가 같은 링크로 들어오면 두 사람이 적은 내역과 일정이 실시간으로 함께 보여요.</li>
           <li>각 내역 오른쪽의 작은 프로필 사진이 누가 적었는지 알려줘요.</li>
-        </ol></div>
+        </ol></div>` : `<div class="help"><ol>
+          <li>지금은 HTML 파일로 열어서 이 브라우저에만 저장돼요.</li>
+          <li>부부가 실시간으로 같이 쓰려면 claude.ai에 올린 공유 링크로 열어 주세요.</li>
+          <li>이 파일에 적은 내용은 아래 <b>백업 파일 저장</b>으로 받은 뒤, 공유 링크의 설정 탭에서 <b>백업 불러오기</b>로 옮길 수 있어요.</li>
+        </ol></div>`}
+      </section>
+      <section class="panel"><h2>데이터 백업 <small>${S.mode === "shared" ? "공유 저장소" : "이 브라우저"}</small></h2>
+        <div class="help">${S.mode === "shared"
+          ? "다른 곳(HTML 파일)에서 저장한 백업 파일을 이 공유 가계부로 불러올 수 있어요. 같은 내역은 덮어써요."
+          : "기록은 이 브라우저 안에만 있어서 브라우저 기록을 지우면 사라져요. 가끔 백업 파일을 저장해 두세요."}</div>
+        <div class="actions" style="justify-content:flex-start">
+          ${S.mode !== "shared" && canSaveFile() ? `<button class="primary" data-act="backupSave">백업 파일 저장</button>` : ""}
+          <label class="ghost" style="display:inline-block;cursor:pointer">백업 불러오기<input type="file" id="backupFile" accept=".json,application/json" hidden></label>
+          ${canSaveFile() ? `<button class="ghost" data-act="csvMonth">${Number(S.ym.slice(5))}월 내역 CSV 저장</button>` : ""}
+        </div>
+        <div class="saved" id="bkMsg"></div>
       </section>
       <section class="panel"><h2>월 예산 <small>0원이면 표시하지 않아요</small></h2>
         <div class="bud-row"><b>전체 지출 예산</b><input id="bud-total" inputmode="numeric" class="num" value="${st.budget.total ? Number(st.budget.total).toLocaleString("ko-KR") : ""}" placeholder="0"></div>
         ${st.cats.out.map((c, i) => `<div class="bud-row"><span>${esc(c)}</span><input data-budcat="${esc(c)}" id="bud-${i}" inputmode="numeric" class="num" value="${st.budget.cats[c] ? Number(st.budget.cats[c]).toLocaleString("ko-KR") : ""}" placeholder="0"></div>`).join("")}
         <div class="actions"><span class="saved" id="budSaved"></span><button class="primary" data-act="saveBudget">예산 저장</button></div>
       </section>
-      <section class="panel"><h2>분류 관리</h2>${catBlock("out", "지출 분류")}${catBlock("in", "수입 분류")}${catBlock("save", "저축 분류")}</section>
+      <section class="panel"><h2>분류 관리</h2>${catBlock("out", "지출 분류")}${catBlock("in", "수입 분류")}${catBlock("save", "저축 분류")}${catBlock("diary", "다이어리 분류")}</section>
     </div>`;
   }
 
@@ -799,6 +1120,278 @@ button { cursor: pointer; }
     });
   }
 
+  // ---------- preset schedules & file import ----------
+  function presetList() {
+    const { a, b } = S.settings.members;
+    return [
+      { g: "매월 고정 일정", title: "월급날", rep: "monthly", day: 25, tag: "기타" },
+      { g: "매월 고정 일정", title: "카드 대금 결제일", rep: "monthly", day: 14, tag: "결제" },
+      { g: "매월 고정 일정", title: "관리비 납부", rep: "monthly", day: 25, tag: "결제" },
+      { g: "매월 고정 일정", title: "통신비 자동이체", rep: "monthly", day: 20, tag: "결제" },
+      { g: "매월 고정 일정", title: "보험료 자동이체", rep: "monthly", day: 10, tag: "결제" },
+      { g: "매월 고정 일정", title: "적금 자동이체", rep: "monthly", day: 26, tag: "결제" },
+      { g: "우리 가족 기념일 (날짜를 넣어 주세요)", title: "결혼기념일", rep: "yearly", month: "", day: "", tag: "기념일" },
+      { g: "우리 가족 기념일 (날짜를 넣어 주세요)", title: `${a} 생일`, rep: "yearly", month: "", day: "", tag: "기념일", who: "a" },
+      { g: "우리 가족 기념일 (날짜를 넣어 주세요)", title: `${b} 생일`, rep: "yearly", month: "", day: "", tag: "기념일", who: "b" },
+      { g: "세금·공과금 납부 기한", title: "종합소득세 신고·납부", rep: "yearly", month: 5, day: 31, tag: "결제" },
+      { g: "세금·공과금 납부 기한", title: "자동차세 (1기분)", rep: "yearly", month: 6, day: 30, tag: "결제" },
+      { g: "세금·공과금 납부 기한", title: "재산세 (건물·주택 1기분)", rep: "yearly", month: 7, day: 31, tag: "결제" },
+      { g: "세금·공과금 납부 기한", title: "재산세 (토지·주택 2기분)", rep: "yearly", month: 9, day: 30, tag: "결제" },
+      { g: "세금·공과금 납부 기한", title: "자동차세 (2기분)", rep: "yearly", month: 12, day: 31, tag: "결제" }
+    ];
+  }
+  const hasRecurring = (title, rep) => S.recurring.some(r => r.title === title && r.rep === rep);
+
+  function guessTag(title) {
+    if (/생일|생신|기념일|돌잔치|백일/.test(title)) return "기념일";
+    if (/병원|치과|검진|진료|한의원|약국|예방접종/.test(title)) return "병원";
+    if (/납부|결제|이체|대금|요금|관리비|세금|보험료/.test(title)) return "결제";
+    if (/엄마|아빠|부모|시댁|처가|본가|가족|명절/.test(title)) return "가족";
+    return "기타";
+  }
+  function normDate(s) {
+    const m = String(s || "").match(/(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})/);
+    if (!m) return null;
+    const y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > daysIn(y, mo)) return null;
+    return `${y}-${pad(mo)}-${pad(d)}`;
+  }
+  function normTime(s) {
+    s = String(s || "").trim(); if (!s) return "";
+    const m = s.match(/(\d{1,2})\s*[:시]\s*(\d{2})?/); if (!m) return "";
+    let h = +m[1]; const mi = +(m[2] || 0);
+    if (/오후|pm/i.test(s) && h < 12) h += 12;
+    if (/오전|am/i.test(s) && h === 12) h = 0;
+    return h < 24 && mi < 60 ? `${pad(h)}:${pad(mi)}` : "";
+  }
+  function normWho(s) {
+    s = String(s || "").trim();
+    if (!s || /함께|공동|같이|joint/i.test(s)) return "joint";
+    if (s === S.settings.members.a || s.toLowerCase() === "a") return "a";
+    if (s === S.settings.members.b || s.toLowerCase() === "b") return "b";
+    return "joint";
+  }
+  function normRep(s) {
+    s = String(s || "");
+    if (/매월|monthly|month/i.test(s)) return "monthly";
+    if (/매년|yearly|annual|year/i.test(s)) return "yearly";
+    return "none";
+  }
+  function parseCSV(text) {
+    const rows = []; let row = [], f = "", q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+      else if (c === '"') q = true;
+      else if (c === "," || c === "\t") { row.push(f); f = ""; }
+      else if (c === "\n") { row.push(f); rows.push(row); row = []; f = ""; }
+      else if (c !== "\r") f += c;
+    }
+    if (f || row.length) { row.push(f); rows.push(row); }
+    return rows.filter(r => r.some(x => x.trim()));
+  }
+  function itemsFromCSV(text) {
+    const rows = parseCSV(text.replace(/^﻿/, ""));
+    if (!rows.length) return [];
+    const head = rows[0].map(h => h.trim().toLowerCase());
+    const find = (...keys) => head.findIndex(h => keys.some(k => h.includes(k)));
+    let col = { date: 0, time: 1, title: 2, tag: 3, who: 4, rep: 5, memo: 6 };
+    let body = rows;
+    if (head.some(h => /날짜|date|제목|title/.test(h))) {
+      col = { date: find("날짜", "date"), time: find("시간", "time"), title: find("제목", "일정", "title", "subject"), tag: find("종류", "분류", "tag"),
+        who: find("누구", "who"), rep: find("반복", "repeat"), memo: find("메모", "내용", "memo", "description") };
+      body = rows.slice(1);
+    }
+    const at = (r, k) => col[k] >= 0 ? (r[col[k]] || "").trim() : "";
+    return body.map(r => {
+      const title = at(r, "title"), date = normDate(at(r, "date")), tagIn = at(r, "tag");
+      return { date, time: normTime(at(r, "time")), title: title.slice(0, 40), tag: TAGS.includes(tagIn) ? tagIn : guessTag(title),
+        who: normWho(at(r, "who")), rep: normRep(at(r, "rep")), memo: at(r, "memo").slice(0, 80),
+        err: !title ? "제목 없음" : !date ? "날짜 형식 오류" : "" };
+    });
+  }
+  function itemsFromICS(text) {
+    const lines = text.replace(/\r?\n[ \t]/g, "").split(/\r?\n/);
+    const unesc = v => v.replace(/\\n/gi, " ").replace(/\\([,;\\])/g, "$1").trim();
+    const evs = []; let cur = null;
+    for (const ln of lines) {
+      if (ln === "BEGIN:VEVENT") { cur = {}; continue; }
+      if (ln === "END:VEVENT") { if (cur) evs.push(cur); cur = null; continue; }
+      if (!cur) continue;
+      const i = ln.indexOf(":"); if (i < 0) continue;
+      const name = ln.slice(0, i).split(";")[0].toUpperCase(), val = ln.slice(i + 1);
+      if (name === "SUMMARY") cur.title = unesc(val);
+      else if (name === "DESCRIPTION") cur.memo = unesc(val);
+      else if (name === "LOCATION") cur.loc = unesc(val);
+      else if (name === "DTSTART") cur.dt = val.trim();
+      else if (name === "RRULE") cur.rrule = val.toUpperCase();
+    }
+    return evs.map(e => {
+      let date = null, time = "";
+      const m = (e.dt || "").match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})\d{2}(Z)?)?/);
+      if (m) {
+        if (m[6]) { const d = new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5])); date = fmtD(d); time = `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+        else { date = `${m[1]}-${m[2]}-${m[3]}`; if (m[4]) time = `${m[4]}:${m[5]}`; }
+      }
+      const freq = (e.rrule || "").match(/FREQ=(\w+)/)?.[1];
+      const rep = freq === "YEARLY" ? "yearly" : freq === "MONTHLY" ? "monthly" : "none";
+      const title = (e.title || "").slice(0, 40);
+      const memo = [e.loc, e.memo].filter(Boolean).join(" · ").slice(0, 80);
+      return { date, time, title, tag: guessTag(title), who: "joint", rep, memo,
+        note: freq && rep === "none" ? "매주·매일 반복은 첫 날짜만 들어가요" : "",
+        err: !title ? "제목 없음" : !date ? "날짜를 읽지 못함" : "" };
+    });
+  }
+  async function readText(file) {
+    const buf = await file.arrayBuffer();
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(buf); }
+    catch { return new TextDecoder("euc-kr").decode(buf); } // 엑셀에서 저장한 한글 CSV
+  }
+
+  const CSV_TEMPLATE = () => "﻿날짜,시간,제목,종류,누구,반복,메모\n" +
+    `2026-11-07,,결혼기념일,기념일,함께,매년,\n2026-11-25,,관리비 납부,결제,함께,매월,자동이체\n` +
+    `2026-11-12,14:30,치과 정기검진,병원,${S.settings.members.a},,○○치과\n2026-11-21,12:00,부모님과 점심,가족,함께,,\n`;
+
+  async function writeImports(items, setProgress) {
+    let done = 0, skipped = 0;
+    const byMonth = {};
+    for (const it of items.filter(i => i.rep === "none")) (byMonth[ymOf(it.date)] ||= []).push(it);
+    for (const [ym, list] of Object.entries(byMonth)) {
+      const existing = await store.getCol(`months/${ym}/events`);
+      const seen = new Set(existing.map(e => `${e.date}|${e.time || ""}|${e.title}`));
+      for (const it of list) {
+        const key = `${it.date}|${it.time}|${it.title}`;
+        if (seen.has(key)) { skipped++; continue; }
+        seen.add(key);
+        await store.add(`months/${ym}/events`, { date: it.date, title: it.title, time: it.time, tag: it.tag, who: it.who, memo: it.memo, by: S.uid || null, at: Date.now() });
+        setProgress(++done);
+      }
+    }
+    for (const it of items.filter(i => i.rep !== "none")) {
+      const dt = it.date ? parseD(it.date) : null;
+      const month = it.month || (dt ? dt.getMonth() + 1 : 1), day = it.day || dt.getDate();
+      if (S.recurring.some(r => r.title === it.title && r.rep === it.rep && r.day === day && (it.rep === "monthly" || r.month === month))) { skipped++; continue; }
+      await store.add("recurring", { title: it.title, time: it.time || "", tag: it.tag, who: it.who || "joint", memo: it.memo || "", rep: it.rep, day, month,
+        start: it.start || "", by: S.uid || null, at: Date.now() });
+      setProgress(++done);
+    }
+    return { done, skipped };
+  }
+
+  function importModal() {
+    let tab = "preset", items = [];
+    const presets = presetList();
+    const presetHtml = () => {
+      const groups = {};
+      presets.forEach((p, i) => (groups[p.g] ||= []).push([p, i]));
+      return Object.entries(groups).map(([g, list]) => `<div class="preset-group"><h4>${esc(g)}</h4>${list.map(([p, i]) => {
+        const done = hasRecurring(p.title, p.rep);
+        const when = p.rep === "monthly"
+          ? `매월 <input id="pd-${i}" type="number" min="1" max="31" value="${p.day}" aria-label="일">일`
+          : `매년 <input id="pm-${i}" type="number" min="1" max="12" value="${p.month}" aria-label="월" placeholder="월">월 <input id="pd-${i}" type="number" min="1" max="31" value="${p.day}" aria-label="일" placeholder="일">일`;
+        return `<label class="preset ${done ? "done" : ""}"><input type="checkbox" id="pc-${i}" ${done ? "disabled" : ""}>
+          <input type="text" id="pt-${i}" value="${esc(p.title)}" maxlength="40" aria-label="일정 이름">
+          <span class="when">${done ? "등록됨" : when}</span></label>`;
+      }).join("")}</div>`).join("");
+    };
+    const previewHtml = () => {
+      if (!items.length) return "";
+      const ok = items.filter(i => !i.err).length;
+      return `<div class="actions" style="justify-content:space-between"><span style="font-size:13px">${items.length}개 중 <b>${ok}개</b>를 가져올 수 있어요</span>
+        <label style="font-size:13px"><input type="checkbox" id="skipPast"> 지난 일정 빼기</label></div>
+        <div class="pv-wrap"><table class="pv"><thead><tr><th></th><th>날짜</th><th>시간</th><th>제목</th><th>종류</th><th>반복</th></tr></thead><tbody>
+        ${items.map((it, i) => `<tr class="${it.err ? "bad" : ""}"><td><input type="checkbox" data-pi="${i}" ${it.err ? "disabled" : "checked"} aria-label="선택"></td>
+          <td class="num">${esc(it.date || "–")}</td><td class="num">${esc(it.time || "종일")}</td>
+          <td class="t">${esc(it.title || "(제목 없음)")}${it.err ? ` <span class="note">${esc(it.err)}</span>` : it.note ? ` <span class="note">${esc(it.note)}</span>` : ""}</td>
+          <td>${esc(it.tag)}</td><td>${it.rep === "monthly" ? "매월" : it.rep === "yearly" ? "매년" : ""}</td></tr>`).join("")}
+        </tbody></table></div>`;
+    };
+    const bodyHtml = () => tab === "preset"
+      ? `<p style="margin:0;font-size:13px;color:var(--ink-2)">자주 쓰는 고정 일정을 골라 한 번에 등록해요. 이름과 날짜는 바꿔서 넣을 수 있어요.</p>${presetHtml()}`
+      : `<div class="drop" id="drop"><b>일정 파일을 여기에 끌어다 놓거나</b>
+           <label class="primary" style="display:inline-block">파일 고르기<input type="file" id="impFile" accept=".ics,.csv,.txt,text/calendar,text/csv" hidden></label>
+           <small>구글·애플·삼성 캘린더에서 내보낸 <b>.ics</b> 파일, 또는 엑셀로 만든 <b>.csv</b> 파일</small></div>
+         <div class="fmt">CSV는 첫 줄에 머리글을 넣어 주세요. 반복은 매월·매년 또는 빈칸, 누구는 함께·${esc(S.settings.members.a)}·${esc(S.settings.members.b)} 중 하나예요.<br>
+           <code>날짜,시간,제목,종류,누구,반복,메모
+2026-11-07,,결혼기념일,기념일,함께,매년,
+2026-11-12,14:30,치과 정기검진,병원,${esc(S.settings.members.a)},,</code></div>
+         ${canSaveFile() ? `<div><button type="button" class="ghost" id="tplBtn">CSV 양식 받기</button></div>` : ""}
+         <div id="pv">${previewHtml()}</div>`;
+    openModal(`<div style="display:grid;gap:14px">
+      <h3>기본 일정·일정 가져오기</h3>
+      ${segHtml("imp", [["preset", "기본 일정 등록"], ["file", "파일 업로드"]], tab)}
+      <div id="impBody" style="display:grid;gap:10px">${bodyHtml()}</div>
+      <div class="err" id="iErr" hidden></div>
+      <div class="actions"><span class="progress" id="iProg"></span><span class="spacer"></span>
+        <button type="button" class="ghost" id="iCancel">닫기</button><button type="button" class="primary" id="iGo">등록하기</button></div>
+    </div>`, root => {
+      root.classList.add("wide");
+      const st = { imp: tab };
+      const err = $("#iErr", root);
+      const showErr = t => { err.textContent = t; err.hidden = !t; };
+      const mountBody = () => {
+        $("#impBody", root).innerHTML = bodyHtml(); showErr("");
+        if (tab !== "file") return;
+        const drop = $("#drop", root), inp = $("#impFile", root);
+        const load = async file => {
+          if (!file) return;
+          if (file.size > 5 * 1024 * 1024) { showErr("파일이 너무 커요. 5MB 이하 파일만 올릴 수 있어요."); return; }
+          const text = await readText(file);
+          const isICS = /\.ics$/i.test(file.name) || text.includes("BEGIN:VCALENDAR");
+          items = (isICS ? itemsFromICS(text) : itemsFromCSV(text)).slice(0, 1000);
+          if (!items.length) { showErr("파일에서 일정을 찾지 못했어요. 형식을 확인해 주세요."); }
+          else showErr("");
+          $("#pv", root).innerHTML = previewHtml();
+        };
+        inp.addEventListener("change", () => load(inp.files[0]));
+        drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+        drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+        drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); load(e.dataTransfer.files[0]); });
+        const tpl = $("#tplBtn", root);
+        if (tpl) tpl.onclick = async () => {
+          try { await saveFile("myaccountbook-일정양식.csv", CSV_TEMPLATE(), "text/csv"); }
+          catch (e) { if (e?.code !== "declined") showErr("양식을 저장하지 못했어요. 위 예시를 복사해서 써 주세요."); }
+        };
+      };
+      bindSegs(root, st, () => { tab = st.imp; mountBody(); });
+      mountBody();
+      root.addEventListener("change", e => {
+        if (e.target.id === "skipPast") {
+          const t = todayStr();
+          root.querySelectorAll("[data-pi]").forEach(c => { const it = items[c.dataset.pi]; if (!it.err && it.rep === "none" && it.date < t) c.checked = !e.target.checked; });
+        }
+      });
+      $("#iCancel", root).onclick = closeModal;
+      $("#iGo", root).onclick = async () => {
+        let picked = [];
+        if (tab === "preset") {
+          for (let i = 0; i < presets.length; i++) {
+            const c = $("#pc-" + i, root); if (!c || !c.checked) continue;
+            const p = presets[i]; const title = $("#pt-" + i, root).value.trim() || p.title;
+            const day = Number($("#pd-" + i, root).value), month = p.rep === "yearly" ? Number($("#pm-" + i, root).value) : 1;
+            if (!(day >= 1 && day <= 31) || !(month >= 1 && month <= 12) || day > daysIn(2024, month)) { showErr(`'${title}'의 날짜를 확인해 주세요.`); return; }
+            picked.push({ title, rep: p.rep, day, month, tag: p.tag, who: p.who || "joint", time: "", memo: "", start: "" });
+          }
+          if (!picked.length) { showErr("등록할 일정을 하나 이상 골라 주세요."); return; }
+        } else {
+          picked = [...root.querySelectorAll("[data-pi]:checked")].map(c => items[c.dataset.pi]);
+          if (!picked.length) { showErr("먼저 파일을 올리고 가져올 일정을 골라 주세요."); return; }
+        }
+        showErr("");
+        const go = $("#iGo", root); go.disabled = true;
+        const prog = $("#iProg", root);
+        let res = null;
+        const ok = await write(async () => { res = await writeImports(picked, n => { prog.textContent = `등록하는 중 ${n}/${picked.length}`; }); });
+        go.disabled = false;
+        if (ok) {
+          closeModal();
+          showBanner(`일정 ${res.done}개를 등록했어요.${res.skipped ? ` 이미 있는 일정 ${res.skipped}개는 건너뛰었어요.` : ""}`);
+          subscribeMonth();
+        } else if (res === null) prog.textContent = "";
+      };
+    });
+  }
+
   // ---------- events ----------
   $("#prevM").onclick = () => { S.ym = shiftYm(S.ym, -1); subscribeMonth(); };
   $("#nextM").onclick = () => { S.ym = shiftYm(S.ym, 1); subscribeMonth(); };
@@ -810,11 +1403,26 @@ button { cursor: pointer; }
 
   $("#view").addEventListener("click", async e => {
     const t = e.target;
+    const todo = t.closest("[data-todo]");
+    if (todo) { if (t === todo) { todo.disabled = true; if (!(await toggleTodo(todo.dataset.todo))) render(); } return; }
+    const dn = t.closest("[data-done]");
+    if (dn) { if (t === dn) { dn.disabled = true; if (!(await toggleDone(dn.dataset.done))) render(); } return; }
+    if (t.closest("label.todo")) return;
+    if (t.closest('[data-act="toggleHide"]')) { S.dHideDone = !S.dHideDone; render(); return; }
+    const dd = t.closest("[data-dday]");
+    if (dd) { S.dDay = S.dDay === dd.dataset.dday ? null : dd.dataset.dday; render(); return; }
+    if (t.closest('[data-act="clearDday"]')) { e.preventDefault(); S.dDay = null; render(); return; }
+    if (t.closest('[data-act="addDiary"]')) return diaryModal(null);
+    const dcard = t.closest("[data-diary]");
+    if (dcard) { const de = findDiary(dcard.dataset.diary); if (de) diaryModal(de); return; }
     const f = t.closest("[data-f]");
     if (f) { S[f.dataset.f] = f.dataset.v; render(); return; }
     const act = t.closest("[data-act]")?.dataset.act;
     if (act === "addTx") return txModal(null, S.tab === "cal" ? S.selDay : null);
     if (act === "addEv") return evModal(null, S.tab === "cal" ? S.selDay : (todayStr().startsWith(S.ym) ? todayStr() : `${S.ym}-01`), false);
+    if (act === "import") return importModal();
+    if (act === "backupSave") { try { await exportBackup(); $("#bkMsg").textContent = "백업 파일을 저장했어요"; } catch (err) { if (err?.code !== "declined") $("#bkMsg").textContent = "저장하지 못했어요."; } return; }
+    if (act === "csvMonth") { try { await exportMonthCSV(); } catch (err) { if (err?.code !== "declined") $("#bkMsg").textContent = "저장하지 못했어요."; } return; }
     if (act === "saveMembers") {
       const a = $("#memA").value.trim() || "남편", b = $("#memB").value.trim() || "아내";
       if (await saveSettings({ ...S.settings, members: { a, b } })) $("#memSaved").textContent = "저장했어요";
@@ -855,9 +1463,16 @@ button { cursor: pointer; }
     }
   });
   $("#view").addEventListener("keydown", e => {
-    if (e.key === "Enter" && e.target.matches("[data-tx]")) e.target.click();
+    if (e.key === "Enter" && e.target.matches("[data-tx], [data-diary]")) e.target.click();
+  });
+  $("#view").addEventListener("submit", e => {
+    if (e.target.id === "quickAdd") { e.preventDefault(); quickAdd(); }
+  });
+  $("#view").addEventListener("change", e => {
+    if (e.target.id === "backupFile" && e.target.files[0]) { importBackup(e.target.files[0]); e.target.value = ""; }
   });
   $("#view").addEventListener("input", e => {
+    if (e.target.id === "dSearch") { S.dQuery = e.target.value; $("#dList").innerHTML = diaryListHtml(); fillAvatars(); return; }
     if (e.target.matches(".bud-row input")) { const v = parseAmt(e.target.value); e.target.value = v ? v.toLocaleString("ko-KR") : ""; }
   });
   // tooltip for charts
@@ -878,7 +1493,61 @@ button { cursor: pointer; }
   }
 
   // ---------- boot ----------
-  let userApi = null;
+  let userApi = null, downloadsApi = null;
+  let localDump = null, localReplace = null;
+  function storageWorks() {
+    try { localStorage.setItem("hb.test", "1"); localStorage.removeItem("hb.test"); return true; } catch { return false; }
+  }
+  // claude.ai에서는 downloads 기능으로, 파일로 열었을 때는 브라우저 다운로드로 저장
+  const isFramed = (() => { try { return window.top !== window; } catch { return true; } })();
+  const canSaveFile = () => !!downloadsApi || !isFramed;
+  async function saveFile(filename, data, mime) {
+    if (downloadsApi) { await downloadsApi.save({ filename, data }); return; }
+    const url = URL.createObjectURL(new Blob([data], { type: mime }));
+    const a = document.createElement("a"); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  const csvCell = v => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v ?? "");
+
+  async function exportMonthCSV() {
+    const rows = S.tx.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.at || 0) - (b.at || 0));
+    const lines = [["날짜", "구분", "분류", "금액", "결제수단", "누구", "메모"].join(",")]
+      .concat(rows.map(t => [t.date, TYPE_LABEL[t.type], t.cat, t.amount, t.method, whoName(t.who), t.memo].map(csvCell).join(",")));
+    await saveFile(`myaccountbook-${S.ym}.csv`, "﻿" + lines.join("\n") + "\n", "text/csv");
+  }
+  async function exportBackup() {
+    const body = { app: "myaccountbook", version: 1, exportedAt: new Date().toISOString(), data: localDump() };
+    await saveFile(`myaccountbook-백업-${todayStr()}.json`, JSON.stringify(body, null, 1), "application/json");
+  }
+  async function importBackup(file) {
+    const msg = $("#bkMsg");
+    let body;
+    try { body = JSON.parse(await readText(file)); } catch { body = null; }
+    if (!body || body.app !== "myaccountbook" || typeof body.data !== "object") { msg.style.color = "var(--expense)"; msg.textContent = "myaccountbook 백업 파일이 아니에요."; return; }
+    const entries = [];
+    for (let [col, docs] of Object.entries(body.data)) {
+      // 예전 '나만 보기' 다이어리는 공유 다이어리로 합침
+      const priv = col.match(/^data\/users\/[^/]+\/m-(\d{4}-\d{2})\/diary$/);
+      if (priv) col = `months/${priv[1]}/diary`;
+      else if (!/^(settings|recurring|months\/\d{4}-\d{2}\/(tx|events|diary))$/.test(col) || typeof docs !== "object") continue;
+      if (typeof docs !== "object") continue;
+      for (const [id, doc] of Object.entries(docs)) if (/^[A-Za-z0-9_-]{1,64}$/.test(id) && doc && typeof doc === "object") entries.push([col, id, doc]);
+    }
+    if (!entries.length) { msg.textContent = "백업 파일에 불러올 기록이 없어요."; return; }
+    msg.style.color = ""; msg.textContent = `불러오는 중… 0/${entries.length}`;
+    if (S.mode !== "shared" && localReplace) {
+      const merged = localDump();
+      for (const [col, id, doc] of entries) (merged[col] ||= {})[id] = doc;
+      localReplace(merged);
+    } else {
+      let n = 0;
+      const ok = await write(async () => { for (const [col, id, doc] of entries) { await store.set(`${col}/${id}`, doc); msg.textContent = `불러오는 중… ${++n}/${entries.length}`; } });
+      if (!ok) { msg.textContent = ""; return; }
+      subscribeMonth();
+    }
+    showBanner(`백업에서 기록 ${entries.length}개를 불러왔어요.`);
+  }
   function start(useLocal) {
     store = useLocal ? makeLocalStore() : store;
     store.subDoc("settings/main", d => {
@@ -898,8 +1567,8 @@ button { cursor: pointer; }
   render();
   (async () => {
     const claude = window.claude;
-    const [db, user] = claude?.use ? await Promise.all([claude.use("db"), claude.use("user")]) : [null, null];
-    userApi = user;
+    const [db, user, downloads] = claude?.use ? await Promise.all([claude.use("db"), claude.use("user"), claude.use("downloads")]) : [null, null, null];
+    userApi = user; downloadsApi = downloads;
     if (user) {
       const me = await user.me();
       S.uid = me.id;
@@ -908,7 +1577,15 @@ button { cursor: pointer; }
       if (can === false) setReadOnly();
     }
     if (db) { S.mode = "shared"; store = makeDbStore(db); start(false); }
-    else { S.mode = "local"; showBanner("공유 저장소에 연결되지 않아 지금은 이 브라우저에만 저장돼요. claude.ai에 로그인한 상태로 열면 부부가 함께 쓸 수 있어요."); start(true); }
+    else {
+      S.mode = "local";
+      if (!storageWorks()) showBanner("이 브라우저는 파일로 연 페이지의 저장을 막고 있어요. 새로고침하면 기록이 사라지니 Chrome이나 Edge로 열어 주세요.");
+      else if (!claude) showBanner("이 파일에 적은 내용은 지금 쓰는 브라우저에만 저장돼요. 다른 기기로 옮기거나 지켜 두려면 설정 탭에서 백업 파일을 저장하세요.");
+      else showBanner("공유 저장소에 연결되지 않아 지금은 이 브라우저에만 저장돼요. claude.ai에 로그인한 상태로 열면 부부가 함께 쓸 수 있어요.");
+      start(true);
+    }
   })();
 })();
 </script>
+</body>
+</html>
