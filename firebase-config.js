@@ -1,16 +1,16 @@
 // myaccountbook Firebase 설정
-// Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에 나오는 firebaseConfig 값을 아래에 붙여 넣으세요.
-// 이 값들은 웹페이지에 공개되는 값이라 GitHub에 올려도 괜찮아요. 실제 보호는 firestore.rules 보안 규칙이 해요.
+// Firebase 웹 설정값은 브라우저가 읽는 공개 값이에요. 실제 보호는 firestore.rules(두 이메일만 허용)가 해요.
 window.MYACCOUNTBOOK_CONFIG = {
   firebase: {
-    apiKey: "여기에_apiKey",
-    authDomain: "여기에_프로젝트ID.firebaseapp.com",
-    projectId: "여기에_프로젝트ID",
-    storageBucket: "여기에_프로젝트ID.appspot.com",
-    messagingSenderId: "여기에_messagingSenderId",
-    appId: "여기에_appId"
+    apiKey: "AIzaSyDCsdiB8kqV30L9UltP_FR-6ndVZmK5JLE",
+    authDomain: "shmyaccount.firebaseapp.com",
+    projectId: "shmyaccount",
+    storageBucket: "shmyaccount.firebasestorage.app",
+    messagingSenderId: "792209283763",
+    appId: "1:792209283763:web:9dfe041c6e72d62aa9aec6",
+    measurementId: "G-KFXJ57XSS8"
   },
-  // 함께 쓸 두 사람의 구글 계정 이메일 (firestore.rules에도 똑같이 넣어 주세요)
+  // 함께 쓸 두 사람의 구글 계정 이메일 (firestore.rules와 같게)
   allowedEmails: [
     "shlee5316@gmail.com",
     "ljs9323@gmail.com"
